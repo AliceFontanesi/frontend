@@ -1,56 +1,32 @@
-$(document).ready(function(){
-    $.ajax({
-        url: 'http://localhost:8000/products', // URL del tuo server Python che fornisce l'API JSON per i prodotti
-        type: 'GET',
-        success: function(response){
-            console.log('Risposta ricevuta:', response); // Controllo: log della risposta ricevuta
-            displayProducts(response); // Funzione per visualizzare i prodotti nella pagina HTML
-        },
-        error: function(xhr, status, error) {
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('http://localhost:8000/products')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Risposta ricevuta:', data); // Controllo: log della risposta ricevuta
+            displayProducts(data); // Funzione per visualizzare i prodotti nella pagina HTML
+        })
+        .catch(error => {
             console.error('Errore:', error); // Gestione degli errori
-        }
-    });
+        });
 });
 
-
 function displayProducts(data) {
-    var products = json.loads(data.decode('utf-8')); // Parsing dei dati JSON
-    //manca foreach
-    attributes = data['data']['attributes']
-    marca = attributes.get('marca')
-    nome = attributes.get('nome')
-    prezzo = attributes.get('prezzo')
-   
+    var products = data.data; // Dati dei prodotti
     var output = '<ul>';
     products.forEach(function(product) {
-        output += '<li>ID: ' + product["id"] + ', Nome: ' + nome + ', Prezzo: ' + prezzo + ', Marca: ' + marca + '</li>';
+        var attributes = product.attributes;
+        var marca = attributes.marca;
+        var nome = attributes.nome;
+        var prezzo = attributes.prezzo;
+        output += '<li>ID: ' + product.id + ', Nome: ' + nome + ', Prezzo: ' + prezzo + ', Marca: ' + marca + '</li>';
     });
     output += '</ul>';
-   
+
     // Inserimento dell'HTML nella pagina HTML
-    document.write(output)
-    $('#output').html(output);
+    document.getElementById('output').innerHTML = output;
 }
-
-
-
-
-
-
-
-
-/*function displayProducts(data) {
-    var products = JSON.parse(data).data; // Parsing dei dati JSON
-    console.log('Prodotti:', products); // Controllo: log dei prodotti
-   
-    // Costruzione dell'HTML per visualizzare i prodotti
-    var output = '<ul>';
-    products.forEach(function(product) {
-        output += '<li>ID: ' + product["id"] + ', Nome: ' + product.attributes["nome"] + ', Prezzo: ' + product.attributes["prezzo"] + ', Marca: ' + product.attributes["marca"] + '</li>';
-    });
-    output += '</ul>';
-   
-    // Inserimento dell'HTML nella pagina HTML
-    document.write(output)
-    //$('#output').html(output);
-}*/
